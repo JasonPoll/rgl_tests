@@ -19,6 +19,9 @@ end
 # 1: get the visualization and connection info into the data_feeds/tabular_transforms format, and feed them into graphit().
 # 2: Start from visualizations, and graph backwards.
 # 2.1: Graph individual/sets-of visualizations in order to drill-in.
+# 3: get pages, listing visualizations found on them.
+# 3.1 use to identify orphaned visualizations
+# 3.2 use to identify dead areas of the pipeline for cleanup
 
 # weird_ones = tabular_transforms_raw.map{|h| [h[:properties][:propertyValues].find{|h2| h2[:propertyDefName] == 'name'}[:value], h[:properties][:propertyValues].find{|h2| h2[:propertyDefName] == 'attributes'}]}.select{|a| a.second.nil?}
 # => [["LM Device Group Map by Customer", nil], ["Open Tickets by Org", nil], ["ZenDesk Ticket Staus Count", nil], ["LM Nomadix Devices by Device Group ID", nil]]
