@@ -3,7 +3,40 @@ require 'active_support/all'
 require 'rgl/adjacency'
 require 'rgl/dot'
 
-def talbe_nodes_filename=(val)
+require 'rgl/rdot'
+
+# this needs to go somewhere else, and needs to be ...different. . .
+module RGL
+  module Graph
+    def to_dot_graph(params = {})
+      params['name'] ||= self.class.name.gsub(/:/, '_')
+      fontsize       = params['fontsize'] ? params['fontsize'] : '8'
+      graph          = (directed? ? DOT::Digraph : DOT::Graph).new(params)
+      edge_class     = directed? ? DOT::DirectedEdge : DOT::Edge
+
+      each_vertex do |v|
+        graph << DOT::Node.new(
+            'name'     => vertex_id(v),
+            'fontsize' => fontsize,
+            'label'    => vertex_label(v),
+            'shape'    => 'box'
+        )
+      end
+
+      each_edge do |u, v|
+        graph << edge_class.new(
+            'from'     => vertex_id(u),
+            'to'       => vertex_id(v),
+            'fontsize' => fontsize
+        )
+      end
+
+      graph
+    end
+  end
+end
+
+def table_nodes_filename=(val)
   @table_nodes_filename = val
 end
 def table_nodes_filename
@@ -67,6 +100,28 @@ def graphit
   graph = grind_hash(tabular_transforms, graph)
 
   graph
+end
+
+def graph_children(h)
+
+  child_nodes = children_nodes(h.map{|h| h[:id]})
+
+  graph = grind_hash(h, RGL::DirectedAdjacencyGraph.new)
+  graph = grind_hash(child_nodes, graph)
+
+  graph
+end
+
+# testing with data_feeds.select{|h| ['LM Devices Count', 'LM Devices Page'].include?(h[:name])}.map{|h| h[:id]}
+def children_nodes(ids)
+  child_nodes =
+    (data_feeds.select{|h| h[:upstream_ids].any?{|uid| ids.include?(uid)}} +
+    tabular_transforms.select{|h| h[:upstream_ids].any?{|uid| ids.include?(uid)}})
+
+  if !child_nodes.empty?
+    child_nodes += children_nodes(child_nodes.map{|h| h[:id]})
+  end
+  child_nodes
 end
 
 
