@@ -11,6 +11,11 @@ def data
   @data ||= JSON.parse(File.read(fn)).deep_symbolize_keys
 end
 
+# * Fugly massive PNG?  Gimp can view it.
+# https://dreampuf.github.io/GraphvizOnline/ is your friend for validating/viewing .dot files.
+# graphit().write_to_graphic_file('png')
+# graphit().print_dotted_on
+
 # 1: get the visualization and connection info into the data_feeds/tabular_transforms format, and feed them into graphit().
 # 2: Start from visualizations, and graph backwards.
 # 2.1: Graph individual/sets-of visualizations in order to drill-in.
